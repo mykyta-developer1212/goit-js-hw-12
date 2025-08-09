@@ -1,4 +1,4 @@
-import {
+import { 
   createGallery,
   clearGallery,
   showLoader,
@@ -63,12 +63,12 @@ loadMoreBtn.addEventListener('click', async () => {
     const data = await getImagesByQuery(searchQuery, page);
     createGallery(data.hits);
 
-    await new Promise(resolve => requestAnimationFrame(resolve));
+    const galleryHeight = gallery.getBoundingClientRect().height;
 
-    const lastCard = gallery.lastElementChild;
-    if (lastCard) {
-      slowScrollTo(lastCard.offsetTop - 100, 200);
-    }
+    window.scrollBy({
+      top: galleryHeight * 2,
+      behavior: 'smooth',
+    });
 
     if (page * perPage >= data.totalHits) {
       iziToast.info({ message: "We're sorry, but you've reached the end of search results.", position: 'topRight' });
@@ -81,23 +81,3 @@ loadMoreBtn.addEventListener('click', async () => {
     hideLoader();
   }
 });
-
-function slowScrollTo(targetY, duration) {
-  const startY = window.scrollY;
-  const distance = targetY - startY;
-  let startTime = null;
-
-  function step(currentTime) {
-    if (!startTime) startTime = currentTime;
-    const progress = currentTime - startTime;
-    const percent = Math.min(progress / duration, 1);
-    window.scrollTo(0, startY + distance * easeInOutQuad(percent));
-    if (percent < 1) requestAnimationFrame(step);
-  }
-
-  function easeInOutQuad(t) {
-    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-  }
-
-  requestAnimationFrame(step);
-}
