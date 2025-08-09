@@ -1,4 +1,4 @@
-import { 
+import {
   createGallery,
   clearGallery,
   showLoader,
@@ -61,14 +61,22 @@ loadMoreBtn.addEventListener('click', async () => {
 
   try {
     const data = await getImagesByQuery(searchQuery, page);
+
+    if (data.hits.length === 0) {
+      iziToast.info({ message: "We're sorry, but you've reached the end of search results.", position: 'topRight' });
+      return;
+    }
+
     createGallery(data.hits);
 
-    const galleryHeight = gallery.getBoundingClientRect().height;
-
-    window.scrollBy({
-      top: galleryHeight * 2,
-      behavior: 'smooth',
-    });
+    const card = document.querySelector('.gallery-item');
+    if (card) {
+      const cardHeight = card.getBoundingClientRect().height;
+      window.scrollBy({
+        top: cardHeight * 2,
+        behavior: 'smooth',
+      });
+    }
 
     if (page * perPage >= data.totalHits) {
       iziToast.info({ message: "We're sorry, but you've reached the end of search results.", position: 'topRight' });
